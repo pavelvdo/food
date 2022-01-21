@@ -74,13 +74,7 @@ window.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    //функция которая добавляет 0 когда часы или дни меньше 10
-    function addZero (num) {
-        if (num >= 0 && num < 10) {
-            num = `0${num}`;
-        }
-        return num;
-    }
+
 
     //функция которая будет устанавливать наш таймер на страничку
 
@@ -108,10 +102,59 @@ window.addEventListener('DOMContentLoaded', () => {
                 clearInterval(timeInterval);
             }
         }
-
+        
+        //функция которая добавляет 0 когда часы или дни меньше 10
+        function addZero (num) {
+            if (num >= 0 && num < 10) {
+                num = `0${num}`;
+            }
+            return num;
+        }
 
     }
 
     setTimer('.timer', deadline);
+
+    //добавляем модальное окно
+
+    const btnModal = document.querySelectorAll('[data-modal]'),
+          btnClose = document.querySelector('[data-close]'),
+          modal = document.querySelector('.modal');
+
+    btnModal.forEach((btn) => {
+
+        btn.addEventListener ('click', () => {
+            
+            modal.classList.add('show');
+            modal.classList.remove('hide');
+            //отключение прокрутки при модальном окне
+            document.body.style.overflow = 'hidden';
+        });
+    });
+        
+        function closeModal() {
+            modal.classList.add('hide');
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        btnClose.addEventListener ('click', closeModal);
+            
+        //делаем закрытие окна при нажатии на подложку
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+         
+        //закрытие на клавишу esc
+        document.addEventListener('keydown', (e) => {
+            //console.log(e.code);
+            if(e.code === "Escape" && modal.classList.contains('show')) {
+                closeModal();
+            }
+        });
+
+    //console.log(modal);
 
 });
