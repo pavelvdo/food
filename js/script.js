@@ -278,4 +278,71 @@ window.addEventListener('DOMContentLoaded', () => {
         'menu__item'
     ).render();
     
+    //Forms lesson 53
+
+    const forms = document.querySelectorAll('form');
+
+    const message = {
+        loading: 'Загрузка',
+        success: 'Спасибо! Скоро мы с вами свяжемся',
+        failure: 'Что-то пошло не так...'
+    };
+    
+
+    //подвязываем к формам функци. postData
+    forms.forEach(item => {
+        postData(item);
+    });
+
+    //теперь создаем функцию которая будет постить данные на сервер
+    function postData(form) {
+        //навешиваем собитие submit которое будет срабатывать кадждый раз, когда мы будем пытаться отправить форму
+        form.addEventListener('submit', (e) => {
+            //если есть элемент с тегом button у него всегда есть submit
+            e.preventDefault();
+
+            //создадим динамически блок в котором выведем сообщение о статусе отправки формы
+            const statusMessage = document.createElement('div');
+            statusMessage.classList.add('status');
+            statusMessage.textContent = message.loading;
+            form.append(statusMessage);
+
+            const request = new XMLHttpRequest();
+            request.open('POST', 'server.php');
+            //FORMdata формат передачи данных формы
+            //для formdata нужно писать заголовок multipart/form-data
+            //когда мы используем XMLHttpRequest и FormData заголовки устанавливаются автоматически!!!
+            //в ручную их устанавливать не нужнО!!!!
+            //request.setRequestHeader('Content-type', 'multipart/form-data');
+            request.setRequestHeader('Content-type', 'multipart/json');//c использованием json!
+
+            const formData = new FormData(form);
+            //обязательно в верстке у интерактива (input и т.д.) должен быть атрибут name иначе formdata работать не будет
+            //request.send(formData);
+            //json
+            //создаем промежуточный обьект для json
+            const obj = {};
+            formData.forEach(function(value, key) {
+                obj[key] = value;
+            });
+            //
+            //request.send(formData);
+            const json = JSON.stringify(obj);
+            
+            request.send(json);
+
+            request.addEventListener('load', () => {
+                if (request.status === 200) {
+                    console.log(request.response);
+                    statusMessage.textContent = message.success;
+                    form.reset();
+                    setTimeout(() => {
+                        statusMessage.remove();
+                    }, 2000);
+                } else {
+                    statusMessage.textContent = message.failure;
+                }
+            });
+        });
+    }
 });
