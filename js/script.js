@@ -312,7 +312,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 display: block;
                 margin: 0 auto;
             `;
-            //form.append(statusMessage);
+            //form.append(statusMessage); чтобы разместить спиннер после формы (снизу)
             form.insertAdjacentElement('afterend', statusMessage);
 
             const request = new XMLHttpRequest();
