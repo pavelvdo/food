@@ -291,11 +291,22 @@ window.addEventListener('DOMContentLoaded', () => {
 
     //подвязываем к формам функци. postData
     forms.forEach(item => {
-        postData(item);
+        bindPostData(item);
     });
 
+    //async и await используются вместе, async ставиться перед функцией, а await перед местом которое нужно подождать!!!
+    const postData = async (url, data) => {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: {'Content-type': 'application/json'},
+            body: data
+        });
+
+        return await res.json();
+    };
+
     //теперь создаем функцию которая будет постить данные на сервер
-    function postData(form) {
+    function bindPostData(form) {
         //навешиваем собитие submit которое будет срабатывать кадждый раз, когда мы будем пытаться отправить форму
         form.addEventListener('submit', (e) => {
             //если есть элемент с тегом button у него всегда есть submit
@@ -324,23 +335,17 @@ window.addEventListener('DOMContentLoaded', () => {
             //request.setRequestHeader('Content-type', 'multipart/json');//c использованием json!
 
             const formData = new FormData(form);
-            //обязательно в верстке у интерактива (input и т.д.) должен быть атрибут name иначе formdata работать не будет
+            //обязательно в верстке у интерактива (input и т.д.) должен быть атрибут name иначе formdata работать не будеt
             //request.send(formData);
             //json
             //создаем промежуточный обьект для json
-            const obj = {};
-            formData.forEach(function(value, key) {
-                obj[key] = value;
-            });
+            //formData.entries() - созаем массив массивов из formdata а потом наоборот делаем обьект Object.fromEntries()
+            const json = JSON.stringify(Object.fromEntries(formData.entries()));
             // //
             // //request.send(formData);
             // const json = JSON.stringify(obj);
             
-            fetch('server.php', {
-                method: 'POST',
-                headers: {'Content-type': 'multipart/json'},
-                body: JSON.stringify(obj)
-            }).then(data => data.text())
+            postData('http://localhost:3000/requests', json)
             .then(data => {
                 console.log(data);
                 getThanksModal(message.success);
@@ -381,14 +386,6 @@ window.addEventListener('DOMContentLoaded', () => {
             prevModal.classList.remove('hide');
             closeModal();
         }, 4000);
-        
     }
 
-    // fetch('https://jsonplaceholder.typicode.com/posts', {
-    //     method: "POST",
-    //     body: JSON.stringify({name: 'Pavel'}),
-    //     headers: {'content-type': 'application/json'}
-    // })
-    // .then(response => response.json())
-    // .then(json => console.log(json));
 });
