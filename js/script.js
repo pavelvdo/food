@@ -315,14 +315,13 @@ window.addEventListener('DOMContentLoaded', () => {
             //form.append(statusMessage); чтобы разместить спиннер после формы (снизу)
             form.insertAdjacentElement('afterend', statusMessage);
 
-            const request = new XMLHttpRequest();
-            request.open('POST', 'server.php');
+
             //FORMdata формат передачи данных формы
             //для formdata нужно писать заголовок multipart/form-data
             //когда мы используем XMLHttpRequest и FormData заголовки устанавливаются автоматически!!!
             //в ручную их устанавливать не нужнО!!!!
             //request.setRequestHeader('Content-type', 'multipart/form-data');
-            request.setRequestHeader('Content-type', 'multipart/json');//c использованием json!
+            //request.setRequestHeader('Content-type', 'multipart/json');//c использованием json!
 
             const formData = new FormData(form);
             //обязательно в верстке у интерактива (input и т.д.) должен быть атрибут name иначе formdata работать не будет
@@ -333,23 +332,27 @@ window.addEventListener('DOMContentLoaded', () => {
             formData.forEach(function(value, key) {
                 obj[key] = value;
             });
-            //
-            //request.send(formData);
-            const json = JSON.stringify(obj);
+            // //
+            // //request.send(formData);
+            // const json = JSON.stringify(obj);
             
-            request.send(json);
-
-            request.addEventListener('load', () => {
-                if (request.status === 200) {
-                    console.log(request.response);
-                    //statusMessage.textContent = message.success;
-                    getThanksModal(message.success);
-                    form.reset();
-                    statusMessage.remove();
-                } else {
-                    getThanksModal(message.failure);
-                }
+            fetch('server.php', {
+                method: 'POST',
+                headers: {'Content-type': 'multipart/json'},
+                body: JSON.stringify(obj)
+            }).then(data => data.text())
+            .then(data => {
+                console.log(data);
+                getThanksModal(message.success);
+                statusMessage.remove();
+            })
+            .catch(() => {
+                getThanksModal(message.failure);
+            })
+            .finally(() => {
+                form.reset();
             });
+
         });
     }
 
@@ -380,4 +383,12 @@ window.addEventListener('DOMContentLoaded', () => {
         }, 4000);
         
     }
+
+    // fetch('https://jsonplaceholder.typicode.com/posts', {
+    //     method: "POST",
+    //     body: JSON.stringify({name: 'Pavel'}),
+    //     headers: {'content-type': 'application/json'}
+    // })
+    // .then(response => response.json())
+    // .then(json => console.log(json));
 });
